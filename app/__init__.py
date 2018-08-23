@@ -11,4 +11,4 @@ migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = 'login' #'login'為endpoint名，與url_for('login')中的參數是一樣的
 
-from app import routes, models
+from app import routes, models, errors
