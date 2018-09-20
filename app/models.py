@@ -4,6 +4,7 @@ from flask_login import UserMixin
 from hashlib import md5
 from app import db, login
 
+#因為這是一個只有外鍵的輔助表，所以不用model類別
 followers = db.Table('followers',
     db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
@@ -30,6 +31,7 @@ class User(UserMixin, db.Model):
     #通常在一對多的"一"這邊定義
     posts = db.relationship('Post', backref='author', lazy='dynamic')
 
+    #傳回產生實例的類別名稱則定義__repr__()
     def __repr__(self):
         return '<User {}>'.format(self.username)
 
@@ -58,6 +60,7 @@ class User(UserMixin, db.Model):
         if self.is_following(user):
             self.followed.remove(user)
 
+    #follower.c.followed_id的意思是follower裡面的followed_id這個欄位 c應該是指column
     def is_following(self, user):
         return self.followed.filter(followers.c.followed_id == user.id).count() > 0
 
@@ -71,7 +74,8 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.String(140))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id')) #Flask-SQLAlchemy會把類名設為小寫來當作對應表的名稱
+    #Flask-SQLAlchemy會把類名設為小寫來當作對應表的名稱
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self):
         return '<Post {}>'.format(self.body)
